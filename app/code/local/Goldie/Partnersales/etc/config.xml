@@ -27,15 +27,15 @@
         </blocks>
         <events>
             <!--set cookie for partner-->
-            <controller_action_layout_load_before>
+            <controller_action_layout_render_before>
                 <observers>
-                    <partnersales_observer>
+                    <goldie_partnersales>
                         <type>singleton</type>
                         <class>goldie_partnersales/observer</class>
                         <method>setPartnerCookie</method>
-                    </partnersales_observer>
+                    </goldie_partnersales>
                 </observers>
-            </controller_action_layout_load_before>
+            </controller_action_layout_render_before>
             <!--create multiple invoices and multiple shipments-->
             <checkout_onepage_controller_success_action>
                 <observers>
