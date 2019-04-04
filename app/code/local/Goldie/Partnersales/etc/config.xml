@@ -26,6 +26,16 @@
             </goldie_partnersales>
         </blocks>
         <events>
+            <!--set cookie for partner-->
+            <controller_action_layout_load_before>
+                <observers>
+                    <partnersales_observer>
+                        <type>singleton</type>
+                        <class>goldie_partnersales/observer</class>
+                        <method>setPartnerCookie</method>
+                    </partnersales_observer>
+                </observers>
+            </controller_action_layout_load_before>
 
         </events>
         <helpers>
