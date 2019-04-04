@@ -36,6 +36,16 @@
                     </partnersales_observer>
                 </observers>
             </controller_action_layout_load_before>
+            <!--create multiple invoices and multiple shipments-->
+            <checkout_onepage_controller_success_action>
+                <observers>
+                    <invoiceshipment_observer>
+                        <type>singleton</type>
+                        <class>goldie_partnersales/observer</class>
+                        <method>partnerInvoiceCreator</method>
+                    </invoiceshipment_observer>
+                </observers>
+            </checkout_onepage_controller_success_action>
 
         </events>
         <helpers>
