@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Goldie_Partnersales>
+            <version>1.0.0</version>
+        </Goldie_Partnersales>
+    </modules>
+    <global>
+        <models>
+            <goldie_partnersales>
+                <class>Goldie_Partnersales_Model</class>
+                <resourceModel>goldie_partnersales_resource</resourceModel>
+            </goldie_partnersales>
+            <goldie_partnersales_resource>
+                <class>Goldie_Partnersales_Model_Resource</class>
+                <entities>
+                    <partners>
+                        <table>partners</table>
+                    </partners>
+                </entities>
+            </goldie_partnersales_resource>
+        </models>
+        <blocks>
+            <goldie_partnersales>
+                <class>Goldie_Partnersales_Block</class>
+            </goldie_partnersales>
+        </blocks>
+        <events>
+
+        </events>
+        <helpers>
+            <goldie_partnersales>
+                <class>Goldie_Partnersales_Helper</class>
+            </goldie_partnersales>
+        </helpers>
+        <resources>
+            <goldie_partnersales_setup>
+                <setup>
+                    <module>Goldie_Partnersales</module>
+                </setup>
+            </goldie_partnersales_setup>
+        </resources>
+    </global>
+    <adminhtml>
+        <layout>
+            <!-- layout upgrade configuration for sales order grid-->
+            <updates>
+                <example_salesgrid>
+                    <file>goldie/salesgrid.xml</file>
+                </example_salesgrid>
+            </updates>
+        </layout>
+    </adminhtml>
+</config>
