@@ -46,8 +46,8 @@ class Goldie_Partnersales_Model_OrderSplitter extends Mage_Core_Model_Abstract
      */
     protected function chunkOrderItems($orderItems,&$splitItems)
     {
-        $totalOrdered = $orderItems->getTotalItemCount();
-        $lenOfArray_1 = ciel($totalOrdered / 2);
+        $totalOrdered = $this->order->getTotalItemCount();
+        $lenOfArray_1 = ceil($totalOrdered / 2);
         $itemSetOne = [];
         $itemSetTwo = [];
         $counter = 1;
@@ -55,7 +55,7 @@ class Goldie_Partnersales_Model_OrderSplitter extends Mage_Core_Model_Abstract
             //convert order item
             $invoiceItem = Mage::getModel('sales/convert_order')
                 ->itemToInvoiceItem($orderItem);
-            if ($lenOfArray_1 != $counter) {
+            if ( $lenOfArray_1 > $counter) {
                 $itemSetOne[$invoiceItem->getOrderItemId()]
                     = $orderItem->getQtyOrdered();
             } else {
@@ -84,7 +84,7 @@ class Goldie_Partnersales_Model_OrderSplitter extends Mage_Core_Model_Abstract
             $invoice->setEmailSent(false);
             $invoice->getOrder()->setCustomerNoteNotify(false);
             $invoice = Mage::getModel('core/resource_transaction')
-                ->addObject()
+                ->addObject($invoice)
                 ->addObject($invoice->getOrder())
                 ->save();
         } catch(Exception $ex) {

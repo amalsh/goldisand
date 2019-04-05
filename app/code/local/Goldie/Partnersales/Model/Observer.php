@@ -36,7 +36,7 @@ class Goldie_Partnersales_Model_Observer extends Varien_Event_Observer
         if (Mage::helper('goldie_partnersales')->hasPartnerExists()) {
             $partnerName = Mage::helper('goldie_partnersales')->getCookiePartnerName();
             $orderIds = $observer->getEvent()->getOrderIds();
-            if(count($oorderIds)) {
+            if(count($orderIds)) {
                 $order = Mage::getSingleton('sales/order')->load($orderIds[0]);
                 $splitter = new Goldie_Partnersales_Model_Ordersplitter($order);
                 $splitter->splitPartnerSales();
