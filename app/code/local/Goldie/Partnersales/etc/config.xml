@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Goldie_Partnersales>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </Goldie_Partnersales>
     </modules>
     <global>
@@ -62,13 +62,16 @@
         </resources>
     </global>
     <adminhtml>
-        <layout>
-            <!-- layout upgrade configuration for sales order grid-->
-            <updates>
-                <example_salesgrid>
-                    <file>goldie/salesgrid.xml</file>
-                </example_salesgrid>
-            </updates>
-        </layout>
+        <events>
+            <core_block_abstract_prepare_layout_before>
+                <observers>
+                    <customgrid_column_append>
+                        <type>model</type>
+                        <class>Goldie_Partnersales_Model_Observer</class>
+                        <method>appendCustomColumn</method>
+                    </customgrid_column_append>
+                </observers>
+            </core_block_abstract_prepare_layout_before>
+        </events>
     </adminhtml>
 </config>
