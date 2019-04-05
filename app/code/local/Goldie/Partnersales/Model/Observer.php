@@ -39,6 +39,7 @@ class Goldie_Partnersales_Model_Observer
                 $order = Mage::getSingleton('sales/order')->load($oorderIds[0]);
                 $splitter = new Goldie_Partnersales_Model_Ordersplitter($order);
                 $splitter->splitPartnerSales();
+              //  Mage::getModel('')
             }
         }
     }
