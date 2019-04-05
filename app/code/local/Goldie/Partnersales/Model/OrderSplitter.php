@@ -40,11 +40,19 @@ class Goldie_Partnersales_Model_OrderSplitter extends Mage_Core_Model_Abstract
     {
         $totalOrdered = $orderItems->getTotalItemCount();
         $lenOfArray_1 = ciel($totalOrdered/2);
-        foreach($orderItems as $orderItem) {
-
-            $item = Mage::getModel('sales/convert_order')->itemToInvoiceItem($orderItem);
+           $itemSetOne = [];
+           $itemSetTwo = [];
+           $counter = 1;
+         foreach ($orderItems as $orderItem){
+           if($lenOfArray_1 != $counter){
+               $itemSetOne[] = Mage::getModel('sales/convert_order')->itemToInvoiceItem($orderItem);
+           }else{
+               $itemSetTwo[] = Mage::getModel('sales/convert_order')->itemToInvoiceItem($orderItem);
+           }
+           $counter++;
 
         }
+
     }
 
 
