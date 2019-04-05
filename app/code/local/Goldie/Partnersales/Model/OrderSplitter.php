@@ -1,6 +1,7 @@
 <?php
 /***
  * Class Ordersplitter
+ *
  * @desc Create invoice splitters and shipment splitters
  */
 
@@ -26,34 +27,91 @@ class Goldie_Partnersales_Model_OrderSplitter extends Mage_Core_Model_Abstract
     /***
      * Create multiple invoices
      */
-    public function splitInvoices()
+    public function splitPartnerSales()
     {
         $orderItems = $this->order->getAllItems();
+        $splitItems = [];
+        $this->chunkOrderItems($orderItems,$splitItems);
+        foreach ($splitItems as $splitItem){
+            $this->createInvoice($splitItem);
+            $this->createShipments($splitItem);
+        }
 
     }
 
     /***
-     * Chunk ordered items to multiple
+     * Chunk order to multiple
      * @param $orderItems
+     * @param $splitItems
      */
-    protected function chunkOrderItems($orderItems)
+    protected function chunkOrderItems($orderItems,&$splitItems)
     {
         $totalOrdered = $orderItems->getTotalItemCount();
-        $lenOfArray_1 = ciel($totalOrdered/2);
-           $itemSetOne = [];
-           $itemSetTwo = [];
-           $counter = 1;
-         foreach ($orderItems as $orderItem){
-           if($lenOfArray_1 != $counter){
-               $itemSetOne[] = Mage::getModel('sales/convert_order')->itemToInvoiceItem($orderItem);
-           }else{
-               $itemSetTwo[] = Mage::getModel('sales/convert_order')->itemToInvoiceItem($orderItem);
-           }
-           $counter++;
+        $lenOfArray_1 = ciel($totalOrdered / 2);
+        $itemSetOne = [];
+        $itemSetTwo = [];
+        $counter = 1;
+        foreach ($orderItems as $orderItem) {
+            //convert order item
+            $invoiceItem = Mage::getModel('sales/convert_order')
+                ->itemToInvoiceItem($orderItem);
+            if ($lenOfArray_1 != $counter) {
+                $itemSetOne[$invoiceItem->getOrderItemId()]
+                    = $orderItem->getQtyOrdered();
+            } else {
+                $itemSetTwo[$invoiceItem->getOrderItemId()]
+                    = $orderItem->getQtyOrdered();
+            }
+            $counter++;
 
+        }
+        $splitItems = [1=>$itemSetOne,2=>$itemSetTwo];
+
+    }
+
+    /***
+     * Create invoice
+     * @param $invoiceQty
+     *
+     * @throws Exception
+     */
+    protected function createInvoice($invoiceQty)
+    {
+        try {
+            $invoice = Mage::getModel('sales/service_order', $this->order)->prepareInvoice($invoiceQty);
+            // use register() 0 qty items will be displayed as well and the individual order lines will not be set to 'invoiced'
+            $invoice->register();
+            $invoice->setEmailSent(false);
+            $invoice->getOrder()->setCustomerNoteNotify(false);
+            $invoice = Mage::getModel('core/resource_transaction')
+                ->addObject()
+                ->addObject($invoice->getOrder())
+                ->save();
+        } catch(Exception $ex) {
+          throw $ex;
         }
 
     }
+
+    /***
+     * Create Shipment
+     *
+     * @param $shipQty
+     *
+     * @throws Exception
+     */
+    protected function createShipments($shipQty)
+    {
+        try {
+            $shipment = Mage::getModel('sales/service_order', $this->order)->prepareShipment($shipQty);
+            $shipment->save();
+
+        } catch(Exception $ex) {
+            throw $ex;
+        }
+
+    }
+
 
 
 }
