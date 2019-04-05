@@ -14,7 +14,8 @@ class Goldie_Partnersales_Helper_Data extends Mage_Core_Helper_Abstract
     public function setPartnerCookie($partnerId)
     {
         if($partnerCookie = Mage::getModel('core/cookie')->get(self::COOKIE_NAME)){
-            $partnerData = unserialize($partnerCookie[self::COOKIE_NAME]);
+
+            $partnerData = unserialize($partnerCookie);
             //we do not need to reset if already exists partner in cookie
             if($partnerData[Goldie_Partnersales_Model_Partners::PARTNER_ID] != $partnerId) {
                 $partnerData =  Mage::getModel('goldie_partnersales/partners')->getPartnerData($partnerId);

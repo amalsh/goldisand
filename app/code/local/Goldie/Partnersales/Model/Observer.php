@@ -1,6 +1,10 @@
 <?php
 
-
+/***
+ * Partner sales capture observer
+ *
+ * Class Goldie_Partnersales_Model_Observer
+ */
 class Goldie_Partnersales_Model_Observer
 {
 
@@ -25,11 +29,17 @@ class Goldie_Partnersales_Model_Observer
      *
      * @param $observer
      */
-    public function partnerInvoiceCreator($observer)
-    {   //if only partner exists we need to split invoices
+    public function partnerInvoiceCreator(Varien_Event_Observer $observer)
+    {
+        $oorderIds = [];
+        //if only partner exists we need to split invoices
         if (Mage::helper('goldie_partnersales')->hasPartnerExists()) {
-            $order = $observer->getEvent()->getOrder();
-            $splitter = new Goldie_Partnersales_Model_Ordersplitter($order);
+            $oorderIds = $observer->getEvent()->getOrderIds();
+            if(count($oorderIds)) {
+                $order = Mage::getSingleton('sales/order')->load($oorderIds[0]);
+                $splitter = new Goldie_Partnersales_Model_Ordersplitter($order);
+                $splitter->splitPartnerSales();
+            }
         }
     }
 }
