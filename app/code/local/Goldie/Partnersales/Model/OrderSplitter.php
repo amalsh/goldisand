@@ -33,8 +33,11 @@ class Goldie_Partnersales_Model_OrderSplitter extends Mage_Core_Model_Abstract
         $splitItems = [];
         $this->chunkOrderItems($orderItems,$splitItems);
         foreach ($splitItems as $splitItem){
-            $this->createInvoice($splitItem);
-            $this->createShipments($splitItem);
+            if(count($splitItem)){
+                $this->createInvoice($splitItem);
+                $this->createShipments($splitItem);
+               }
+
         }
 
     }
@@ -46,16 +49,16 @@ class Goldie_Partnersales_Model_OrderSplitter extends Mage_Core_Model_Abstract
      */
     protected function chunkOrderItems($orderItems,&$splitItems)
     {
-        $totalOrdered = $this->order->getTotalItemCount();
+        $totalOrdered = count($orderItems);
         $lenOfArray_1 = ceil($totalOrdered / 2);
         $itemSetOne = [];
         $itemSetTwo = [];
-        $counter = 1;
+        $counter = 0;
         foreach ($orderItems as $orderItem) {
             //convert order item
             $invoiceItem = Mage::getModel('sales/convert_order')
                 ->itemToInvoiceItem($orderItem);
-            if ( $lenOfArray_1 > $counter) {
+            if ( $lenOfArray_1 >$counter) {
                 $itemSetOne[$invoiceItem->getOrderItemId()]
                     = $orderItem->getQtyOrdered();
             } else {
@@ -80,6 +83,7 @@ class Goldie_Partnersales_Model_OrderSplitter extends Mage_Core_Model_Abstract
         try {
             $invoice = Mage::getModel('sales/service_order', $this->order)->prepareInvoice($invoiceQty);
             // use register() 0 qty items will be displayed as well and the individual order lines will not be set to 'invoiced'
+            $partnerName = Mage::helper('goldie_partnersales')->getCookiePartnerName();
             $invoice->register();
             $invoice->setEmailSent(false);
             $invoice->getOrder()->setCustomerNoteNotify(false);
@@ -87,6 +91,12 @@ class Goldie_Partnersales_Model_OrderSplitter extends Mage_Core_Model_Abstract
                 ->addObject($invoice)
                 ->addObject($invoice->getOrder())
                 ->save();
+            $this->order->setStatus(Mage_Sales_Model_Order::STATE_COMPLETE);
+
+            $this->order->addStatusHistoryComment('Auto split invoice has been created', false);
+            //set partner name to the grid
+            $this->order->setPartnerName($partnerName);
+            $this->order->save();
         } catch(Exception $ex) {
           throw $ex;
         }
@@ -104,6 +114,8 @@ class Goldie_Partnersales_Model_OrderSplitter extends Mage_Core_Model_Abstract
     {
         try {
             $shipment = Mage::getModel('sales/service_order', $this->order)->prepareShipment($shipQty);
+
+            $this->order->addStatusHistoryComment('Auto split shipment has been created', false);
             $shipment->save();
 
         } catch(Exception $ex) {

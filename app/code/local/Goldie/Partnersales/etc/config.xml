@@ -72,6 +72,14 @@
                     </customgrid_column_append>
                 </observers>
             </core_block_abstract_prepare_layout_before>
+            <sales_order_grid_collection_load_before>
+                <observers>
+                    <goldie_partnersales>
+                        <model>goldie_partnersales/observer</model>
+                        <method>salesOrderGridCollectionLoadBefore</method>
+                    </goldie_partnersales>
+                </observers>
+            </sales_order_grid_collection_load_before>
         </events>
     </adminhtml>
 </config>

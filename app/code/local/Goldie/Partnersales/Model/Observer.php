@@ -32,17 +32,17 @@ class Goldie_Partnersales_Model_Observer extends Varien_Event_Observer
     public function partnerInvoiceCreator(Varien_Event_Observer $observer)
     {
         $oorderIds = [];
+        $helper = Mage::helper('goldie_partnersales');
         //if only partner exists we need to split invoices
-        if (Mage::helper('goldie_partnersales')->hasPartnerExists()) {
-            $partnerName = Mage::helper('goldie_partnersales')->getCookiePartnerName();
+        if ($helper->hasPartnerExists()) {
+
             $orderIds = $observer->getEvent()->getOrderIds();
             if(count($orderIds)) {
-                $order = Mage::getSingleton('sales/order')->load($orderIds[0]);
-                $splitter = new Goldie_Partnersales_Model_Ordersplitter($order);
+                $order = Mage::getModel('sales/order')->load($orderIds[0]);
+               $splitter = new Goldie_Partnersales_Model_Ordersplitter($order);
                 $splitter->splitPartnerSales();
-                //set partner name to the grid
-                $order->setPartnerName($partnerName);
-                $order->save();
+                //remove the cookie
+                $helper->clearPartnerCookie();
             }
         }
     }
@@ -68,5 +68,19 @@ class Goldie_Partnersales_Model_Observer extends Varien_Event_Observer
                 'index'     => 'partner_name',
             ), 'shipping_name');
         }
+    }
+
+    /***
+     * Set value for custom grid attribute sales partner
+     * @param Varien_Event_Observer $observer
+     */
+    public function salesOrderGridCollectionLoadBefore(Varien_Event_Observer $observer)
+    {
+        $collection = $observer->getOrderGridCollection();
+        $select = $collection->getSelect();
+        $select->joinLeft(array('order'=>$collection->getTable('sales/order')),
+            'order.entity_id=main_table.entity_id',array('partner_name'=>'partner_name'));
+
+
     }
 }
